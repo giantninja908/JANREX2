@@ -13,4 +13,5 @@ I'll accept most pull reqs, please don't just make issues without potential solu
 # more info
 
 discord server can be found by clicking the image below:
+
 [![Discord server](https://discordapp.com/api/guilds/858349630881923083/widget.png?style=banner1)](https://discord.gg/UdZvmNeNqq)
