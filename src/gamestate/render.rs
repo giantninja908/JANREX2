@@ -7,7 +7,7 @@ impl Gamestate {
         d.clear_background(Color::BLACK);
         d.draw_text(&format!("Game Code: {}", self.code), 0, 0, 20, Color::WHITE);
 
-        d.draw_text(self.time, 500, 0, 20, Color::WHITE);
+        d.draw_text(&format!("{}", self.time), 500, 0, 20, Color::WHITE);
 
         let mut c = 700;
         for i in self.messages.iter().rev() {

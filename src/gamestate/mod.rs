@@ -28,7 +28,7 @@ impl Time {
         let mut v = s.split(":").collect::<Vec<_>>();
         let a = v[1].split(".").collect::<Vec<_>>();
         v[1] = a[0];
-        match v.get(1) {
+        match a.get(1) {
             Some(l) => Self {
                 minutes: v[0].parse().unwrap(),
                 seconds: v[1].parse().unwrap(),
@@ -40,6 +40,12 @@ impl Time {
                 milliseconds: 0,
             },
         }
+    }
+}
+
+impl ::std::fmt::Display for Time {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "{}:{}.{}", self.minutes, self.seconds, self.milliseconds)
     }
 }
 
