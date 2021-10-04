@@ -28,36 +28,17 @@ impl Time {
         let a = v[1].split(".").collect::<Vec<_>>();
         v[1] = a[0];
         match v.get(1) {
-            Some(l) => {
-                v.push(a[1]);
-                Self {
-                    minutes: v[0].parse().unwrap(),
-                    seconds: v[1].parse().unwrap(),
-                    milliseconds: v[2].parse().unwrap(),
-                }
-            }
+            Some(l) => Self {
+                minutes: v[0].parse().unwrap(),
+                seconds: v[1].parse().unwrap(),
+                milliseconds: l.parse().unwrap(),
+            },
             None => Self {
                 minutes: v[0].parse().unwrap(),
                 seconds: v[1].parse().unwrap(),
                 milliseconds: 0,
             },
         }
-    }
-}
-#[cfg(test)]
-mod test {
-    use super::Time;
-    #[test]
-    fn check() {
-        let time = Time::from("5:00.09".to_string());
-        assert_eq!(
-            time,
-            Time {
-                minutes: 5,
-                seconds: 0,
-                milliseconds: 9
-            }
-        );
     }
 }
 
@@ -116,5 +97,22 @@ impl Gamestate {
                 stream_writer,
             },
         }
+    }
+}
+
+#[cfg(test)]
+mod test {
+    use super::Time;
+    #[test]
+    fn check() {
+        let time = Time::from("5:00.09".to_string());
+        assert_eq!(
+            time,
+            Time {
+                minutes: 5,
+                seconds: 0,
+                milliseconds: 9
+            }
+        );
     }
 }
