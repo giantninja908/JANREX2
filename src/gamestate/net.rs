@@ -4,6 +4,12 @@ use messagepack_rs::{deserializable::Deserializable, value::Value};
 use std::io::BufReader;
 use std::io::Cursor;
 
+macro_rules! send {
+    ($s:expr, $x:expr) => {
+        $s.socket.stream_writer.send($x).await;
+    };
+}
+
 impl Gamestate {
     pub async fn parse_network(&mut self) {
         if let Some(msg) = self.socket.read_stream.next().await {
@@ -16,16 +22,10 @@ impl Gamestate {
                         Value::Array(mes) => {
                             println!("{:?}, {:?}", mes, mes[0]);
                             if mes[0] == Value::from("pi") {
-                                self.socket
-                                    .stream_writer
-                                    .send(Value::from(vec![Value::from("po")]))
-                                    .await;
+                                send!(self, Value::from(vec![Value::from("po")]));
                                 println!("PONG")
                             } else if mes[0] == Value::from("load") {
-                                self.socket
-                                    .stream_writer
-                                    .send(Value::from(vec![Value::from("load"), Value::Nil]))
-                                    .await;
+                                send!(self, Value::from(vec![Value::from("load"), Value::Nil]));
                                 println!("LOAD")
                             } else if mes[0] == Value::from("ch") {
                                 println!(
@@ -36,14 +36,14 @@ impl Gamestate {
                                     }
                                 )
                             } else if mes[0] == Value::from("ready") {
-                                self.socket
-                                    .stream_writer
-                                    .send(Value::from(vec![
+                                send!(
+                                    self,
+                                    Value::from(vec![
                                         Value::from("sb"),
                                         Value::from("welc"),
                                         Value::Nil,
-                                    ]))
-                                    .await;
+                                    ])
+                                );
                             } else if mes[0] == Value::from("t") {
                                 if let Value::String(s) = &mes[1] {
                                     self.time = Time::from(s.to_string());
