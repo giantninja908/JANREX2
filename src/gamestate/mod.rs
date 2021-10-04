@@ -27,11 +27,20 @@ impl Time {
         let mut v = s.split(":").collect::<Vec<_>>();
         let a = v[1].split(".").collect::<Vec<_>>();
         v[1] = a[0];
-        v.push(a[1]);
-        Self {
-            minutes: v[0].parse().unwrap(),
-            seconds: v[1].parse().unwrap(),
-            milliseconds: v[2].parse().unwrap(),
+        match v.get(1) {
+            Some(l) => {
+                v.push(a[1]);
+                Self {
+                    minutes: v[0].parse().unwrap(),
+                    seconds: v[1].parse().unwrap(),
+                    milliseconds: v[2].parse().unwrap(),
+                }
+            }
+            None => Self {
+                minutes: v[0].parse().unwrap(),
+                seconds: v[1].parse().unwrap(),
+                milliseconds: 0,
+            },
         }
     }
 }
