@@ -15,6 +15,7 @@ struct Player {
     class: Class,
 }
 
+#[derive(Debug, Copy, Clone, PartialEq, Eq)]
 struct Time {
     minutes: u32,
     seconds: u32,
@@ -30,8 +31,17 @@ impl Time {
         Self {
             minutes: v[0].parse().unwrap(),
             seconds: v[1].parse().unwrap(),
-            milliseconds: v[1].parse().unwrap(),
+            milliseconds: v[2].parse().unwrap(),
         }
+    }
+}
+#[cfg(test)]
+mod test {
+    use super::Time;
+    #[test]
+    fn check() {
+        let time = Time::from("5:00.09".to_string());
+        assert_eq!(time, Time{minutes:5, seconds: 0, milliseconds: 9});
     }
 }
 
