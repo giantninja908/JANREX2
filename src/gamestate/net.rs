@@ -1,4 +1,4 @@
-use super::{Gamestate, Time};
+use super::{Gamestate, Message, Time};
 use futures_util::StreamExt;
 use messagepack_rs::{deserializable::Deserializable, value::Value};
 use std::io::BufReader;
@@ -34,7 +34,17 @@ impl Gamestate {
                                         Value::String(msg) => msg,
                                         _ => "undefined",
                                     }
-                                )
+                                );
+                                self.messages.push(Message {
+                                    content: match &mes[3] {
+                                        Value::String(msg) => msg.to_string(),
+                                        _ => String::from("undefined"),
+                                    },
+                                    sender: match &mes[2] {
+                                        Value::String(auth) => Some(auth.to_string()),
+                                        _ => None,
+                                    },
+                                });
                             } else if mes[0] == Value::from("ready") {
                                 send!(
                                     self,

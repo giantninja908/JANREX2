@@ -51,8 +51,13 @@ struct SocketData {
     >,
 }
 
+pub struct Message {
+    sender: Option<String>,
+    content: String,
+}
+
 pub struct Gamestate {
-    messages: Vec<String>,
+    messages: Vec<Message>,
     players: Vec<Player>,
     time: Time,
     socket: SocketData,
