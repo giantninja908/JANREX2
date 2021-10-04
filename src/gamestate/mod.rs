@@ -45,7 +45,16 @@ impl Time {
 
 impl ::std::fmt::Display for Time {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(f, "{}:{}.{}", self.minutes, self.seconds, self.milliseconds)
+        write!(
+            f,
+            "{}:{}",
+            self.minutes,
+            if self.seconds > 9 {
+                format!("{}", self.seconds)
+            } else {
+                format!("0{}", self.seconds)
+            }
+        )
     }
 }
 
