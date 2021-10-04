@@ -1,6 +1,5 @@
 mod net;
-
-use crate::{token_fetch, PacketSender};
+use crate::{packet_sender::PacketSender, token_fetch};
 use futures_util::StreamExt;
 use raylib::prelude::*;
 use tokio_tungstenite::connect_async;
