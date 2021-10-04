@@ -1,8 +1,8 @@
 use super::Gamestate;
 use futures_util::StreamExt;
-use std::io::Cursor;
-use std::io::BufReader;
 use messagepack_rs::{deserializable::Deserializable, value::Value};
+use std::io::BufReader;
+use std::io::Cursor;
 
 impl Gamestate {
     pub async fn parse_network(&mut self) {

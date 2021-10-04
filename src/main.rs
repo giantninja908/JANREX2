@@ -27,7 +27,7 @@ async fn main() {
         let mut d = rl.begin_drawing(&thread);
         d.clear_background(Color::BLACK);
         d.draw_text("SOON", 10, 10, 50, Color::WHITE);
-gamestate.parse_network().await;
+        gamestate.parse_network().await;
     }
 
     // pin_mut!(stdin_to_ws, ws_to_stdout);
