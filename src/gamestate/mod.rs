@@ -41,7 +41,14 @@ mod test {
     #[test]
     fn check() {
         let time = Time::from("5:00.09".to_string());
-        assert_eq!(time, Time{minutes:5, seconds: 0, milliseconds: 9});
+        assert_eq!(
+            time,
+            Time {
+                minutes: 5,
+                seconds: 0,
+                milliseconds: 9
+            }
+        );
     }
 }
 

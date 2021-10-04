@@ -1,4 +1,4 @@
-use super::Gamestate;
+use super::{Gamestate, Time};
 use futures_util::StreamExt;
 use messagepack_rs::{deserializable::Deserializable, value::Value};
 use std::io::BufReader;
@@ -44,6 +44,10 @@ impl Gamestate {
                                         Value::Nil,
                                     ]))
                                     .await;
+                            } else if mes[0] == Value::from("t") {
+                                if let Value::String(s) = &mes[1] {
+                                    self.time = Time::from(s.to_string());
+                                }
                             }
                         }
                         _ => {
