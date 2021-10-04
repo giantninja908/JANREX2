@@ -1,4 +1,5 @@
 mod net;
+mod render;
 use crate::{packet_sender::PacketSender, token_fetch};
 use futures_util::StreamExt;
 use raylib::prelude::*;
@@ -61,6 +62,7 @@ pub struct Gamestate {
     players: Vec<Player>,
     time: Time,
     socket: SocketData,
+    code: String,
 }
 
 impl Gamestate {
@@ -101,6 +103,7 @@ impl Gamestate {
                 read_stream: read,
                 stream_writer,
             },
+            code: webinfo.gameId,
         }
     }
 }

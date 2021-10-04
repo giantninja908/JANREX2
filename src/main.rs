@@ -8,11 +8,12 @@ pub(crate) use raylib::prelude::*;
 async fn main() {
     let (mut rl, thread) = raylib::init()
         .msaa_4x()
-        .size(500, 500)
+        .size(1280, 720)
         .title("JANREX 2")
         .build();
 
     rl.set_target_fps(120);
+
     {
         let mut d = rl.begin_drawing(&thread);
         d.clear_background(Color::BLACK);
@@ -22,9 +23,7 @@ async fn main() {
     let mut gamestate = gamestate::Gamestate::new().await;
 
     while !rl.window_should_close() {
-        let mut d = rl.begin_drawing(&thread);
-        d.clear_background(Color::BLACK);
-        d.draw_text("SOON", 10, 10, 50, Color::WHITE);
         gamestate.parse_network().await;
+        gamestate.render(&mut rl, &thread);
     }
 }
