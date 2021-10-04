@@ -32,7 +32,7 @@ impl KeyRotator {
         let mut ret = msg;
         let mut add = KeyRotator::encode_short(self.ah_num);
         ret.append(&mut add);
-        ret.iter().map(|e| *e as u8).collect::<Vec<_>>()
+        ret
     }
     pub fn encode_network_msg_from_val(&mut self, val: messagepack_rs::value::Value) -> Vec<u8> {
         self.encode_network_msg(val.serialize().unwrap())
