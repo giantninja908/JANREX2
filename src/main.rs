@@ -27,7 +27,4 @@ async fn main() {
         d.draw_text("SOON", 10, 10, 50, Color::WHITE);
         gamestate.parse_network().await;
     }
-
-    // pin_mut!(stdin_to_ws, ws_to_stdout);
-    // future::select(stdin_to_ws, ws_to_stdout).await;
 }
