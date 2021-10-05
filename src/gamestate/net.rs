@@ -62,6 +62,10 @@ impl Gamestate {
                                 if let Value::String(s) = &mes[1] {
                                     self.code = s.to_string();
                                 }
+                            } else if mes[0] == Value::from("sb") {
+                                if let Value::String(s) = &mes[1] {
+                                    self.welc_msg = s.to_string();
+                                }
                             }
                         }
                         _ => {

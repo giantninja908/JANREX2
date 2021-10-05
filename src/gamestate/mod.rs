@@ -1,5 +1,5 @@
-mod net;
 mod maps;
+mod net;
 mod render;
 use crate::{packet_sender::PacketSender, token_fetch};
 use futures_util::StreamExt;
@@ -79,6 +79,7 @@ pub struct Gamestate {
     time: Time,
     socket: SocketData,
     code: String,
+    welc_msg: String,
 }
 
 impl Gamestate {
@@ -120,6 +121,7 @@ impl Gamestate {
                 stream_writer,
             },
             code: webinfo.gameId,
+            welc_msg: String::new(),
         }
     }
 }

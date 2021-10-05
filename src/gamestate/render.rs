@@ -23,7 +23,10 @@ impl Gamestate {
                 10,
                 c,
                 17,
-                Color::WHITE,
+                match &i.sender {
+                    Some(_) => Color::WHITE,
+                    None => Color::PURPLE
+                },
             );
             c -= 20;
         }
