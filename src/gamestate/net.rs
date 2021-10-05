@@ -58,6 +58,10 @@ impl Gamestate {
                                 if let Value::String(s) = &mes[1] {
                                     self.time = Time::from(s.to_string());
                                 }
+                            } else if mes[0] == Value::from("inst-id") {
+                                if let Value::String(s) = &mes[1] {
+                                    self.code = s.to_string();
+                                }
                             }
                         }
                         _ => {
