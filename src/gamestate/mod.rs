@@ -1,4 +1,5 @@
 mod net;
+mod maps;
 mod render;
 use crate::{packet_sender::PacketSender, token_fetch};
 use futures_util::StreamExt;
