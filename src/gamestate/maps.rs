@@ -170,7 +170,7 @@ impl Map {
 
         Ok(Map {
             spawns,
-            objects: Vec::new(),
+            objects,
         })
     }
     pub fn render(
