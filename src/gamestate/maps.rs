@@ -137,8 +137,16 @@ impl Map {
             .map(|e| &e.as_str().unwrap()[1..])
             .collect::<Vec<_>>();
         let scales = {
-            let a = val["xyz"].as_array().unwrap().iter();
-            0
+            let a = val["xyz"].as_array().unwrap().iter().collect::<Vec<_>>();
+            let mut sc: Vec<[f32; 3]> = Vec::new();
+            for b in 0..a.len() / 3 {
+                sc.push([
+                    a[b].as_f64().unwrap() as f32,
+                    a[b + 1].as_f64().unwrap() as f32,
+                    a[b + 2].as_f64().unwrap() as f32,
+                ]);
+            }
+            sc
         };
 
         let objects = val["objects"]
@@ -147,7 +155,7 @@ impl Map {
             .iter()
             .map(|obj| {
                 let pos = obj["p"].as_array().unwrap();
-                let scale = Vector3::zero();
+                let scale = scales[obj["si"].as_u64().unwrap() as usize];
                 let is_true =
                     |val: &serde_json::Value| val.is_string() && val.as_str().unwrap() == "0";
                 Object {
@@ -156,7 +164,7 @@ impl Map {
                         pos[1].as_f64().unwrap() as f32,
                         pos[2].as_f64().unwrap() as f32,
                     ),
-                    scale,
+                    scale: Vector3::new(scale[0], scale[1], scale[2]),
                     collision: is_true(&obj["l"]),
                     color: Color::from_hex(cols[obj["ci"].as_u64().unwrap() as usize]).unwrap(),
                     grapplable: is_true(&obj["gp"]),
@@ -168,10 +176,7 @@ impl Map {
             })
             .collect::<Vec<_>>();
 
-        Ok(Map {
-            spawns,
-            objects,
-        })
+        Ok(Map { spawns, objects })
     }
     pub fn render(
         &self,
