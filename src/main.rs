@@ -1,4 +1,5 @@
 mod gamestate;
+mod gui;
 mod key_rotate;
 mod packet_sender;
 mod token_fetch;
