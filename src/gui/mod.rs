@@ -68,3 +68,59 @@ pub enum GuiElement {
         tint: Option<Color>,
     },
 }
+
+// gui helper functions
+impl GuiElement {
+    /// given an index and new string, modify a TEXT object recursively
+    pub fn mod_text(&mut self, index: u32, new_text: String) -> bool {
+        match self {
+            GuiElement::Box { children, .. } => {
+                //recursion
+                if let Some(childs) = children {
+                    childs
+                        .iter_mut()
+                        .map(|child| child.mod_text(index, new_text.to_owned()))
+                        .fold(false, |a, b| a || b) // see if one returns true, and return that as a success
+                } else {
+                    false
+                }
+            }
+            GuiElement::Text {
+                index: indx, text, ..
+            } => {
+                if &index == indx {
+                    *text = new_text;
+                    return true;
+                } else {
+                    return false;
+                }
+            }
+            _ => false,
+        }
+    }
+
+    /// returns indecies of all children buttons that are clicked recursively
+    pub fn pressed_buttons(&self) -> Vec<u32> {
+        match self {
+            GuiElement::Box { children, .. } => {
+                //recursion
+                if let Some(childs) = children {
+                    childs
+                        .iter()
+                        .map(|child| child.pressed_buttons())
+                        .flatten()
+                        .collect::<Vec<_>>()
+                } else {
+                    Vec::new()
+                }
+            }
+            GuiElement::Button { status, index, .. } => {
+                return match status {
+                    GuiButtonStatus::Click => vec![*index],
+                    _ => Vec::new(),
+                }
+            }
+            _ => Vec::new(),
+        }
+    }
+}
