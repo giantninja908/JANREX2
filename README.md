@@ -5,6 +5,7 @@ this client aims to be an ACTUAL client, that can fundementally interface with k
 # compiling
 
 we reccomend using RUSTUP for a rust installation, and a simple `cargo run` is enough to be up and running
+you require a CMAKE installation for raylib, a dependancy used for graphics
 
 # contributing
 
