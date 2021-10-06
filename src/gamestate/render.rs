@@ -32,5 +32,13 @@ impl Gamestate {
             );
             c -= 20;
         }
+
+
+        let active_menu = match self.menus.active {
+            super::ActiveMenu::MainMenu => &mut self.menus.main_menu,
+            super::ActiveMenu::InGame => &mut self.menus.in_game,
+        };
+
+        active_menu.draw(&mut d, thread, Vector2::zero(), self.window_size);
     }
 }

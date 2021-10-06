@@ -1,5 +1,6 @@
 use raylib::prelude::*;
 mod draw;
+mod menus;
 mod update;
 pub use draw::*;
 pub use update::*;

@@ -1,7 +1,8 @@
 mod maps;
 mod net;
 mod render;
-use crate::{packet_sender::PacketSender, token_fetch};
+mod update;
+use crate::{gui, packet_sender::PacketSender, token_fetch};
 use futures_util::StreamExt;
 use raylib::prelude::*;
 use tokio_tungstenite::connect_async;
@@ -73,6 +74,17 @@ pub struct Message {
     content: String,
 }
 
+enum ActiveMenu {
+    MainMenu,
+    InGame,
+}
+
+struct GameMenus {
+    main_menu: gui::GuiElement,
+    in_game: gui::GuiElement,
+    active: ActiveMenu,
+}
+
 pub struct Gamestate {
     messages: Vec<Message>,
     players: Vec<Player>,
@@ -80,10 +92,12 @@ pub struct Gamestate {
     socket: SocketData,
     code: String,
     welc_msg: String,
+    menus: GameMenus,
+    window_size: Vector2,
 }
 
 impl Gamestate {
-    pub async fn new() -> Self {
+    pub async fn new(rl: &mut RaylibHandle) -> Self {
         let token = token_fetch::token_arg().await;
         println!("{:?}", token);
         let webinfo = token_fetch::get_websocket_info(&token).await.unwrap();
@@ -122,6 +136,12 @@ impl Gamestate {
             },
             code: webinfo.gameId,
             welc_msg: String::new(),
+            menus: GameMenus {
+                main_menu: gui::GuiElement::main_menu(),
+                in_game: gui::GuiElement::ingame_menu(),
+                active: ActiveMenu::MainMenu,
+            },
+            window_size: Vector2::new(1280.0, 720.0),
         }
     }
 }

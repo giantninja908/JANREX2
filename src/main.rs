@@ -11,6 +11,7 @@ async fn main() {
         .msaa_4x()
         .size(1280, 720)
         .title("JANREX 2")
+        .resizable()
         .build();
 
     rl.set_target_fps(120);
@@ -21,10 +22,11 @@ async fn main() {
         d.draw_text("LOADING", 10, 10, 50, Color::WHITE);
     }
 
-    let mut gamestate = gamestate::Gamestate::new().await;
+    let mut gamestate = gamestate::Gamestate::new(&mut rl).await;
 
     while !rl.window_should_close() {
         gamestate.parse_network().await;
+        gamestate.update(&mut rl, &thread);
         gamestate.render(&mut rl, &thread);
     }
 }
