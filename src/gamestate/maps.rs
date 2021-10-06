@@ -115,6 +115,7 @@ struct Map {
 }
 
 impl Map {
+    /// returns a map constructed from raw text that's JSON encoded
     pub fn from_map_text<'a>(text: &'a str) -> serde_json::Result<Self> {
         let val: serde_json::Value = serde_json::from_str(text)?;
         let spawns = val["spawns"]
@@ -178,6 +179,8 @@ impl Map {
 
         Ok(Map { spawns, objects })
     }
+
+    /// using raylib handles, render a map
     pub fn render(
         &self,
         mut rl: &mut raylib::drawing::RaylibMode3D<raylib::drawing::RaylibDrawHandle>,

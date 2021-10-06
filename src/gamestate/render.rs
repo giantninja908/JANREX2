@@ -2,6 +2,8 @@ use super::Gamestate;
 use raylib::prelude::*;
 
 impl Gamestate {
+    /// render function
+    /// renders the GameState, takes raylib requirements
     pub fn render(&mut self, mut rl: &mut raylib::RaylibHandle, thread: &RaylibThread) {
         let mut d = rl.begin_drawing(thread);
         d.clear_background(Color::BLACK);

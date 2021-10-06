@@ -4,6 +4,7 @@ use messagepack_rs::{deserializable::Deserializable, value::Value};
 use std::io::BufReader;
 use std::io::Cursor;
 
+/// macro to send a gamestate object with a messagepack Value to a GameState
 macro_rules! send {
     ($s:expr, $x:expr) => {
         $s.socket.stream_writer.send($x).await;
@@ -11,6 +12,10 @@ macro_rules! send {
 }
 
 impl Gamestate {
+    /// parse network data
+    /// seperated from update function to be more streamline
+    /// assumes only one possible message, multiple calls will have to be made in order to assure it's
+    /// fully parsed and no waiting packets
     pub async fn parse_network(&mut self) {
         if let Some(msg) = self.socket.read_stream.next().await {
             if let Ok(msg) = msg {

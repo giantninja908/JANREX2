@@ -2,6 +2,8 @@ use reqwest;
 use serde::{Deserialize, Serialize};
 use urlencoding::encode;
 
+/// fetches client key used for token generation
+/// fails in the event it cannot get data
 async fn client_key() -> Result<String, Box<dyn std::error::Error + Send + Sync>> {
     let body = reqwest::get("https://api.sys32.dev/v2/key")
         .await?
@@ -11,6 +13,7 @@ async fn client_key() -> Result<String, Box<dyn std::error::Error + Send + Sync>
     Ok(body)
 }
 
+/// a struct to hold a token data
 #[derive(Deserialize, Serialize, Debug)]
 struct MatchmakerToken {
     token: String,
@@ -18,6 +21,9 @@ struct MatchmakerToken {
     sid: u32,
 }
 
+/// retrieves the matchmaker token
+/// returns it as a struct representation of the json
+/// errors on inability to get data
 async fn matchmaker_token(
     client_key: &String,
 ) -> Result<MatchmakerToken, Box<dyn std::error::Error + Send + Sync>> {
@@ -36,6 +42,9 @@ async fn matchmaker_token(
 
 type HashReturn = Vec<u32>;
 
+/// hashes a token
+/// krunker requests require a hashed token
+/// the alg is not yet publicly known
 async fn hask_token(
     token: &MatchmakerToken,
 ) -> Result<String, Box<dyn std::error::Error + Send + Sync>> {
@@ -58,6 +67,9 @@ async fn hask_token(
     Ok(b)
 }
 
+/// fetches the token argument asyncronously
+/// to be used in matchmaking
+/// will panic! if an error occurred
 pub async fn token_arg() -> String {
     println!("fetching client key...");
     let client_key = client_key().await.unwrap();
@@ -67,6 +79,8 @@ pub async fn token_arg() -> String {
     hask_token(&token).await.unwrap()
 }
 
+/// representation of data returned from websocket
+/// includes potential reason for change
 #[allow(non_snake_case)]
 #[derive(Deserialize, Serialize, Debug)]
 pub struct WebsocketReturnData {
@@ -77,6 +91,9 @@ pub struct WebsocketReturnData {
     pub changeReason: Option<String>,
 }
 
+/// gets information about the websocket
+/// uses krunker matchmaking to seek a game
+/// currently assumes NA East for requirest region
 pub async fn get_websocket_info(
     token: &String,
 ) -> Result<WebsocketReturnData, Box<dyn std::error::Error + Send + Sync>> {
