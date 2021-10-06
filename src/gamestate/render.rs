@@ -25,7 +25,7 @@ impl Gamestate {
                 17,
                 match &i.sender {
                     Some(_) => Color::WHITE,
-                    None => Color::PURPLE
+                    None => Color::PURPLE,
                 },
             );
             c -= 20;

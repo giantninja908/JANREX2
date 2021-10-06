@@ -408,6 +408,7 @@ dependencies = [
  "regex",
  "reqwest",
  "serde",
+ "serde_json",
  "tokio",
  "tokio-tungstenite",
  "urlencoding",
