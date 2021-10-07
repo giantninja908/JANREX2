@@ -44,7 +44,12 @@ impl Gamestate {
 
         {
             //3d rendering!!!
-            let mut d2 = d.begin_mode3D(Camera::perspective(Vector3::new(100.0, 100.0, 100.0), Vector3::zero(), Vector3::new(0.0, 1.0, 0.0), 90.0));
+            let mut d2 = d.begin_mode3D(Camera::perspective(
+                Vector3::new(100.0, 100.0, 100.0),
+                Vector3::zero(),
+                Vector3::new(0.0, 1.0, 0.0),
+                90.0,
+            ));
             self.map.render(&mut d2, thread);
         }
 
