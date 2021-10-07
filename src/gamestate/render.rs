@@ -5,6 +5,7 @@ impl Gamestate {
     /// render function
     /// renders the GameState, takes raylib requirements
     pub fn render(&mut self, mut rl: &mut raylib::RaylibHandle, thread: &RaylibThread) {
+        let time = rl.get_time() as f32;
         let mut d = rl.begin_drawing(thread);
         d.clear_background(Color::BLACK);
         d.draw_text(&format!("Game Code: {}", self.code), 0, 0, 20, Color::WHITE);
@@ -45,7 +46,11 @@ impl Gamestate {
         {
             //3d rendering!!!
             let mut d2 = d.begin_mode3D(Camera::perspective(
-                Vector3::new(100.0, 100.0, 100.0),
+                Vector3::new(
+                    (time * 0.1).sin() * 100.0,
+                    100.0,
+                    (time * 0.1).cos() * 100.0,
+                ),
                 Vector3::zero(),
                 Vector3::new(0.0, 1.0, 0.0),
                 90.0,

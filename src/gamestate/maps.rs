@@ -172,28 +172,42 @@ impl Map {
             .unwrap()
             .iter()
             .map(|obj| {
-                let pos = obj["p"].as_array().unwrap();
-                let scale = scales[obj["si"].as_u64().unwrap() as usize];
-                let is_true =
-                    |val: &serde_json::Value| val.is_string() && val.as_str().unwrap() == "0";
-                Object {
-                    position: Vector3::new(
-                        pos[0].as_f64().unwrap() as f32,
-                        pos[1].as_f64().unwrap() as f32,
-                        pos[2].as_f64().unwrap() as f32,
-                    ),
-                    scale: Vector3::new(scale[0], scale[1], scale[2]),
-                    collision: is_true(&obj["l"]),
-                    color: if obj["ci"].is_u64() {
-                        Color::from_hex(cols[obj["ci"].as_u64().unwrap() as usize]).unwrap()
-                    } else {
-                        Color::WHITE
-                    },
-                    grapplable: is_true(&obj["gp"]),
-                    texture: (ObjectTexture::Stone, ObjectTextureVariant::Default),
-                    visible: is_true(&obj["v"]),
-                    wall_jumpable: is_true(&obj["wj"]),
-                    r#type: ObjectType::Cube,
+                if obj["i"].is_null() {
+                    let pos = obj["p"].as_array().unwrap();
+                    let scale = scales[obj["si"].as_u64().unwrap() as usize];
+                    let is_true =
+                        |val: &serde_json::Value| val.is_string() && val.as_str().unwrap() == "0";
+                    Object {
+                        position: Vector3::new(
+                            pos[0].as_f64().unwrap() as f32,
+                            pos[1].as_f64().unwrap() as f32 + (scale[1] / 2.0),
+                            pos[2].as_f64().unwrap() as f32,
+                        ),
+                        scale: Vector3::new(scale[0], scale[1], scale[2]),
+                        collision: is_true(&obj["l"]),
+                        color: if obj["ci"].is_u64() {
+                            Color::from_hex(cols[obj["ci"].as_u64().unwrap() as usize]).unwrap()
+                        } else {
+                            Color::WHITE
+                        },
+                        grapplable: is_true(&obj["gp"]),
+                        texture: (ObjectTexture::Stone, ObjectTextureVariant::Default),
+                        visible: !is_true(&obj["v"]),
+                        wall_jumpable: is_true(&obj["wj"]),
+                        r#type: ObjectType::Cube,
+                    }
+                } else {
+                    Object {
+                        position: Vector3::zero(),
+                        scale: Vector3::one(),
+                        collision: false,
+                        color: Color::BLANK,
+                        grapplable: false,
+                        visible: false,
+                        wall_jumpable: false,
+                        r#type: ObjectType::AcidBarrel,
+                        texture: (ObjectTexture::Stone, ObjectTextureVariant::Default),
+                    }
                 }
             })
             .collect::<Vec<_>>();
@@ -208,7 +222,9 @@ impl Map {
         thread: &RaylibThread,
     ) {
         for obj in self.objects.iter() {
-            rl.draw_cube_v(obj.position, obj.scale, obj.color);
+            if obj.visible {
+                rl.draw_cube_v(obj.position, obj.scale, obj.color);
+            }
         }
     }
 }
