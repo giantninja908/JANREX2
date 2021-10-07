@@ -4,11 +4,34 @@ use serde_json;
 pub mod map {
     pub const BURG: &str = include_str!("../../maps/burg.json");
     pub const LITTLETOWN: &str = include_str!("../../maps/littletown.json");
+    pub const SANDSTORM: &str = include_str!("../../maps/sandstorm.json");
+    pub const SUBZERO: &str = include_str!("../../maps/subzero.json");
+    pub const UNDERGROWTH: &str = include_str!("../../maps/undergrowth.json");
+    pub const SHIPYARN: &str = include_str!("../../maps/shipyard.json");
+    pub const FREIGHT: &str = include_str!("../../maps/freight.json");
+    pub const LOSTWORLD: &str = include_str!("../../maps/lostworld.json");
+    pub const CITADEL: &str = include_str!("../../maps/citadel.json");
     pub fn from_index(indx: u8) -> &'static str {
         if indx == 0 {
             BURG
-        } else {
+        } else if indx == 1 {
             LITTLETOWN
+        } else if indx == 2 {
+            SANDSTORM
+        } else if indx == 3 {
+            SUBZERO
+        } else if indx == 4 {
+            UNDERGROWTH
+        } else if indx == 5 {
+            SHIPYARN
+        } else if indx == 6 {
+            FREIGHT
+        } else if indx == 7 {
+            LOSTWORLD
+        } else if indx == 8 {
+            CITADEL
+        } else {
+            panic!("Map not implemeneted yet");
         }
     }
 }
@@ -159,9 +182,9 @@ impl Map {
             let mut sc: Vec<[f32; 3]> = Vec::new();
             for b in 0..a.len() / 3 {
                 sc.push([
-                    a[b*3].as_f64().unwrap() as f32,
-                    a[b*3 + 1].as_f64().unwrap() as f32,
-                    a[b*3 + 2].as_f64().unwrap() as f32,
+                    a[b * 3].as_f64().unwrap() as f32,
+                    a[b * 3 + 1].as_f64().unwrap() as f32,
+                    a[b * 3 + 2].as_f64().unwrap() as f32,
                 ]);
             }
             sc
