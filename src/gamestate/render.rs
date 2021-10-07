@@ -30,6 +30,7 @@ impl Gamestate {
                     },
                 )
             })
+            .take(7) //limit to 7 chat messages at once
             .fold(String::new(), |a, b| a + &format!("\n{}", b.0));
 
         let active_menu = match self.menus.active {
@@ -40,6 +41,12 @@ impl Gamestate {
             }
             super::ActiveMenu::InGame => &mut self.menus.in_game,
         };
+
+        {
+            //3d rendering!!!
+            let mut d2 = d.begin_mode3D(Camera::perspective(Vector3::new(100.0, 100.0, 100.0), Vector3::zero(), Vector3::new(0.0, 1.0, 0.0), 90.0));
+            self.map.render(&mut d2, thread);
+        }
 
         active_menu.draw(&mut d, thread, Vector2::zero(), self.window_size);
     }

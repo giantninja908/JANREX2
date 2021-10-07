@@ -9,7 +9,7 @@ impl super::GuiElement {
             border: None,
             x: GuiSize::Fixed(0.0),
             y: GuiSize::Fixed(0.0),
-            color: Color::DARKGRAY,
+            color: Color::BLANK,
             children: Some(vec![
                 Box {
                     // chat box

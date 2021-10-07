@@ -94,6 +94,7 @@ pub struct Gamestate {
     welc_msg: String,
     menus: GameMenus,
     window_size: Vector2,
+    map: maps::Map,
 }
 
 impl Gamestate {
@@ -121,6 +122,10 @@ impl Gamestate {
         let (write, read) = ws_stream.split();
 
         let stream_writer = PacketSender::new(write).await;
+        let map_dat = maps::map::from_index(0);
+        println!("{}", map_dat);
+        let map = maps::Map::from_map_text(map_dat).unwrap();
+        println!("{:?}", map);
 
         Self {
             messages: Vec::new(),
@@ -142,6 +147,7 @@ impl Gamestate {
                 active: ActiveMenu::MainMenu,
             },
             window_size: Vector2::new(1280.0, 720.0),
+            map,
         }
     }
 }

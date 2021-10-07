@@ -1,16 +1,25 @@
 use raylib::prelude::*;
 use serde_json;
 
-mod map {
+pub mod map {
     pub const BURG: &str = include_str!("../../maps/burg.json");
     pub const LITTLETOWN: &str = include_str!("../../maps/littletown.json");
+    pub fn from_index(indx: u32) -> &'static str {
+        if indx == 0 {
+            BURG
+        } else {
+            LITTLETOWN
+        }
+    }
 }
 
+#[derive(Debug)]
 struct Spawn {
     pos: Vector3,
     rotation: f32,
 }
 
+#[derive(Debug)]
 enum ObjectTextureVariant {
     Default,
     Classic,
@@ -18,6 +27,7 @@ enum ObjectTextureVariant {
     ClassicAlt,
 }
 
+#[derive(Debug)]
 enum ObjectTexture {
     Stone,
     Dirt,
@@ -38,6 +48,7 @@ enum ObjectTexture {
     Tile,
 }
 
+#[derive(Debug)]
 enum ObjectType {
     Cube,
     Crate,
@@ -97,6 +108,7 @@ enum ObjectType {
     Knight,
 }
 
+#[derive(Debug)]
 struct Object {
     position: Vector3,
     scale: Vector3,
@@ -109,7 +121,8 @@ struct Object {
     color: Color,
 }
 
-struct Map {
+#[derive(Debug)]
+pub struct Map {
     spawns: Vec<Spawn>,
     objects: Vec<Object>,
 }
@@ -120,14 +133,18 @@ impl Map {
         let val: serde_json::Value = serde_json::from_str(text)?;
         let spawns = val["spawns"]
             .as_array()
+            .unwrap()
             .iter()
-            .map(|e| Spawn {
-                pos: Vector3::new(
-                    e[0].as_f64().unwrap() as f32,
-                    e[1].as_f64().unwrap() as f32,
-                    e[2].as_f64().unwrap() as f32,
-                ),
-                rotation: e[4].as_f64().unwrap() as f32 * 90.0,
+            .map(|e| {
+                println!("{:?}", e);
+                Spawn {
+                    pos: Vector3::new(
+                        e[0].as_f64().unwrap() as f32,
+                        e[1].as_f64().unwrap() as f32,
+                        e[2].as_f64().unwrap() as f32,
+                    ),
+                    rotation: e[4].as_f64().unwrap() as f32 * 90.0,
+                }
             })
             .collect::<Vec<_>>();
 
@@ -167,7 +184,11 @@ impl Map {
                     ),
                     scale: Vector3::new(scale[0], scale[1], scale[2]),
                     collision: is_true(&obj["l"]),
-                    color: Color::from_hex(cols[obj["ci"].as_u64().unwrap() as usize]).unwrap(),
+                    color: if obj["ci"].is_u64() {
+                        Color::from_hex(cols[obj["ci"].as_u64().unwrap() as usize]).unwrap()
+                    } else {
+                        Color::WHITE
+                    },
                     grapplable: is_true(&obj["gp"]),
                     texture: (ObjectTexture::Stone, ObjectTextureVariant::Default),
                     visible: is_true(&obj["v"]),
