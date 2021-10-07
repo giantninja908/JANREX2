@@ -159,9 +159,9 @@ impl Map {
             let mut sc: Vec<[f32; 3]> = Vec::new();
             for b in 0..a.len() / 3 {
                 sc.push([
-                    a[b].as_f64().unwrap() as f32,
-                    a[b + 1].as_f64().unwrap() as f32,
-                    a[b + 2].as_f64().unwrap() as f32,
+                    a[b*3].as_f64().unwrap() as f32,
+                    a[b*3 + 1].as_f64().unwrap() as f32,
+                    a[b*3 + 2].as_f64().unwrap() as f32,
                 ]);
             }
             sc
