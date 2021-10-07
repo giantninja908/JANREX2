@@ -9,7 +9,7 @@ pub(crate) use raylib::prelude::*;
 async fn main() {
     let (mut rl, thread) = raylib::init()
         .msaa_4x()
-        .size(1280, 720)
+        .size(1920, 1080)
         .title("JANREX 2")
         .resizable()
         .build();
