@@ -4,7 +4,7 @@ use serde_json;
 pub mod map {
     pub const BURG: &str = include_str!("../../maps/burg.json");
     pub const LITTLETOWN: &str = include_str!("../../maps/littletown.json");
-    pub fn from_index(indx: u32) -> &'static str {
+    pub fn from_index(indx: u8) -> &'static str {
         if indx == 0 {
             BURG
         } else {

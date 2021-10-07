@@ -1,5 +1,8 @@
-use super::{Gamestate, Message, Time};
-use futures_util::{SinkExt, StreamExt};
+use super::{
+    maps::{map::from_index, Map},
+    Gamestate, Message, Time,
+};
+use futures_util::StreamExt;
 use messagepack_rs::{deserializable::Deserializable, value::Value};
 use std::io::BufReader;
 use std::io::Cursor;
@@ -77,6 +80,11 @@ impl Gamestate {
                                 } else if mes[0] == Value::from("sb") {
                                     if let Value::String(s) = &mes[1] {
                                         self.welc_msg = s.to_string();
+                                    }
+                                } else if mes[0] == Value::from("init") {
+                                    // INIT A GAME/MAP
+                                    if let Value::UInt8(v) = mes[1] {
+                                        self.map = Map::from_map_text(from_index(v)).unwrap();
                                     }
                                 }
                             }
