@@ -22,10 +22,10 @@ async fn main() {
         d.draw_text("LOADING", 10, 10, 50, Color::WHITE);
     }
 
-    let mut gamestate = gamestate::Gamestate::new(&mut rl).await;
+    let mut gamestate = gamestate::Gamestate::new(&mut rl, &thread).await;
 
     while !rl.window_should_close() {
-        gamestate.parse_network().await;
+        gamestate.parse_network(&mut rl, &thread).await;
         gamestate.update(&mut rl, &thread);
         gamestate.render(&mut rl, &thread);
     }

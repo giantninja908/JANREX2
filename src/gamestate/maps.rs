@@ -1,5 +1,6 @@
 use raylib::prelude::*;
 use serde_json;
+use std::collections::HashMap;
 
 pub mod map {
     pub const BURG: &str = include_str!("../../maps/burg.json");
@@ -50,7 +51,7 @@ enum ObjectTextureVariant {
     ClassicAlt,
 }
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq, Eq, Hash)]
 enum ObjectTexture {
     Stone,
     Dirt,
@@ -142,17 +143,23 @@ struct Object {
     grapplable: bool,
     r#type: ObjectType,
     color: Color,
+    emission: Option<Color>,
 }
 
 #[derive(Debug)]
 pub struct Map {
     spawns: Vec<Spawn>,
     objects: Vec<Object>,
+    textures: HashMap<ObjectTexture, Texture2D>,
 }
 
 impl Map {
     /// returns a map constructed from raw text that's JSON encoded
-    pub fn from_map_text<'a>(text: &'a str) -> serde_json::Result<Self> {
+    pub fn from_map_text<'a>(
+        text: &'a str,
+        rl: &mut RaylibHandle,
+        thread: &RaylibThread,
+    ) -> serde_json::Result<Self> {
         let val: serde_json::Value = serde_json::from_str(text)?;
         let spawns = val["spawns"]
             .as_array()
@@ -200,6 +207,25 @@ impl Map {
                     let scale = scales[obj["si"].as_u64().unwrap() as usize];
                     let is_true =
                         |val: &serde_json::Value| val.is_string() && val.as_str().unwrap() == "0";
+                    let tval = if obj["t"].is_u64() {
+                        obj["t"].as_u64().unwrap()
+                    } else {
+                        0
+                    };
+
+                    let texval = if tval == 0 {
+                        ObjectTexture::Stone
+                    } else if tval == 1 {
+                        ObjectTexture::Dirt
+                    } else if tval == 2 {
+                        ObjectTexture::Wood
+                    } else if tval == 3 {
+                        ObjectTexture::Grid
+                    } else if tval == 4 {
+                        ObjectTexture::Grey
+                    } else {
+                        ObjectTexture::Default
+                    };
                     Object {
                         position: Vector3::new(
                             pos[0].as_f64().unwrap() as f32,
@@ -214,10 +240,18 @@ impl Map {
                             Color::WHITE
                         },
                         grapplable: is_true(&obj["gp"]),
-                        texture: (ObjectTexture::Stone, ObjectTextureVariant::Default),
+                        texture: (texval, ObjectTextureVariant::Default),
                         visible: !is_true(&obj["v"]),
                         wall_jumpable: is_true(&obj["wj"]),
                         r#type: ObjectType::Cube,
+                        emission: if obj["ci"].is_u64() {
+                            Some(
+                                Color::from_hex(cols[obj["ci"].as_u64().unwrap() as usize])
+                                    .unwrap(),
+                            )
+                        } else {
+                            None
+                        },
                     }
                 } else {
                     Object {
@@ -230,24 +264,185 @@ impl Map {
                         wall_jumpable: false,
                         r#type: ObjectType::AcidBarrel,
                         texture: (ObjectTexture::Stone, ObjectTextureVariant::Default),
+                        emission: None,
                     }
                 }
             })
             .collect::<Vec<_>>();
 
-        Ok(Map { spawns, objects })
+        let mut textures = HashMap::new();
+        macro_rules! insert_tex_to_textu {
+            ($rl: expr, $thread: expr, $textures: expr, $txt: expr, $typ: expr) => {
+                $textures.insert(
+                    $typ,
+                    $rl.load_texture_from_image(
+                        $thread,
+                        &Image::load_image_from_mem(
+                            "png",
+                            &$txt.iter().map(|&e| e).collect::<Vec<_>>(),
+                            $txt.len() as i32,
+                        )
+                        .unwrap(),
+                    )
+                    .unwrap(),
+                );
+            };
+        }
+
+        insert_tex_to_textu!(
+            rl,
+            thread,
+            textures,
+            include_bytes!("../../maps/textures/brick_0.png"),
+            ObjectTexture::Brick
+        );
+        insert_tex_to_textu!(
+            rl,
+            thread,
+            textures,
+            include_bytes!("../../maps/textures/wall_0.png"),
+            ObjectTexture::Stone
+        );
+        insert_tex_to_textu!(
+            rl,
+            thread,
+            textures,
+            include_bytes!("../../maps/textures/dirt_0.png"),
+            ObjectTexture::Dirt
+        );
+        insert_tex_to_textu!(
+            rl,
+            thread,
+            textures,
+            include_bytes!("../../maps/textures/floor_0.png"),
+            ObjectTexture::Wood
+        );
+        insert_tex_to_textu!(
+            rl,
+            thread,
+            textures,
+            include_bytes!("../../maps/textures/grid_0.png"),
+            ObjectTexture::Grid
+        );
+        insert_tex_to_textu!(
+            rl,
+            thread,
+            textures,
+            include_bytes!("../../maps/textures/grey_0.png"),
+            ObjectTexture::Grey
+        );
+
+        Ok(Map {
+            spawns,
+            objects,
+            textures,
+        })
     }
 
     /// using raylib handles, render a map
     pub fn render(
-        &self,
+        &mut self,
         mut rl: &mut raylib::drawing::RaylibMode3D<raylib::drawing::RaylibDrawHandle>,
         thread: &RaylibThread,
     ) {
         for obj in self.objects.iter() {
             if obj.visible {
-                rl.draw_cube_v(obj.position, obj.scale, obj.color);
+                match &obj.texture.0 {
+                    ObjectTexture::Default => {
+                        rl.draw_cube_v(
+                            obj.position,
+                            obj.scale,
+                            match &obj.emission {
+                                Some(e) => e,
+                                None => &obj.color,
+                            },
+                        );
+                    }
+                    _ => match &obj.emission {
+                        Some(e) => rl.draw_cube_v(obj.position, obj.scale, e),
+                        None => Map::render_cube(
+                            self.textures.get(&ObjectTexture::Brick).unwrap(),
+                            obj.position,
+                            obj.scale,
+                            obj.color,
+                        ),
+                    },
+                }
+                // rl.draw_cube_v(obj.position, obj.scale, obj.color);
             }
+        }
+    }
+
+    fn render_cube(texture: &Texture2D, pos: Vector3, scale: Vector3, color: Color) {
+        let (x, y, z) = (pos.x, pos.y, pos.z);
+        let (width, height, length) = (scale.x, scale.y, scale.z);
+        use raylib::ffi::*;
+        unsafe {
+            rlEnableTexture(texture.id);
+            rlBegin(0x0007);
+            rlColor4ub(color.r, color.g, color.b, color.a);
+            // Front Face
+            rlNormal3f(0.0, 0.0, 1.0); // Normal Pointing Towards Viewer
+            rlTexCoord2f(0.0, 0.0);
+            rlVertex3f(x - width / 2.0, y - height / 2.0, z + length / 2.0); // Bottom Left Of The Texture and Quad
+            rlTexCoord2f(width / 100.0, 0.0);
+            rlVertex3f(x + width / 2.0, y - height / 2.0, z + length / 2.0); // Bottom Right Of The Texture and Quad
+            rlTexCoord2f(width / 100.0, height / 100.0);
+            rlVertex3f(x + width / 2.0, y + height / 2.0, z + length / 2.0); // Top Right Of The Texture and Quad
+            rlTexCoord2f(0.0, height / 100.0);
+            rlVertex3f(x - width / 2.0, y + height / 2.0, z + length / 2.0); // Top Left Of The Texture and Quad
+                                                                             // Back Face
+            rlNormal3f(0.0, 0.0, -1.0); // Normal Pointing Away From Viewer
+            rlTexCoord2f(width / 100.0, 0.0);
+            rlVertex3f(x - width / 2.0, y - height / 2.0, z - length / 2.0); // Bottom Right Of The Texture and Quad
+            rlTexCoord2f(width / 100.0, height / 100.0);
+            rlVertex3f(x - width / 2.0, y + height / 2.0, z - length / 2.0); // Top Right Of The Texture and Quad
+            rlTexCoord2f(0.0, height / 100.0);
+            rlVertex3f(x + width / 2.0, y + height / 2.0, z - length / 2.0); // Top Left Of The Texture and Quad
+            rlTexCoord2f(0.0, 0.0);
+            rlVertex3f(x + width / 2.0, y - height / 2.0, z - length / 2.0); // Bottom Left Of The Texture and Quad
+                                                                             // Top Face
+            rlNormal3f(0.0, 1.0, 0.0); // Normal Pointing Up
+            rlTexCoord2f(0.0, length / 100.0);
+            rlVertex3f(x - width / 2.0, y + height / 2.0, z - length / 2.0); // Top Left Of The Texture and Quad
+            rlTexCoord2f(0.0, 0.0);
+            rlVertex3f(x - width / 2.0, y + height / 2.0, z + length / 2.0); // Bottom Left Of The Texture and Quad
+            rlTexCoord2f(width / 100.0, 0.0);
+            rlVertex3f(x + width / 2.0, y + height / 2.0, z + length / 2.0); // Bottom Right Of The Texture and Quad
+            rlTexCoord2f(width / 100.0, length / 100.0);
+            rlVertex3f(x + width / 2.0, y + height / 2.0, z - length / 2.0); // Top Right Of The Texture and Quad
+                                                                             // Bottom Face
+            rlNormal3f(0.0, -1.0, 0.0); // Normal Pointing Down
+            rlTexCoord2f(width / 100.0, length / 100.0);
+            rlVertex3f(x - width / 2.0, y - height / 2.0, z - length / 2.0); // Top Right Of The Texture and Quad
+            rlTexCoord2f(0.0, length / 100.0);
+            rlVertex3f(x + width / 2.0, y - height / 2.0, z - length / 2.0); // Top Left Of The Texture and Quad
+            rlTexCoord2f(0.0, 0.0);
+            rlVertex3f(x + width / 2.0, y - height / 2.0, z + length / 2.0); // Bottom Left Of The Texture and Quad
+            rlTexCoord2f(width / 100.0, 0.0);
+            rlVertex3f(x - width / 2.0, y - height / 2.0, z + length / 2.0); // Bottom Right Of The Texture and Quad
+                                                                             // Right face
+            rlNormal3f(1.0, 0.0, 0.0); // Normal Pointing Right
+            rlTexCoord2f(length / 100.0, 0.0);
+            rlVertex3f(x + width / 2.0, y - height / 2.0, z - length / 2.0); // Bottom Right Of The Texture and Quad
+            rlTexCoord2f(length / 100.0, height / 100.0);
+            rlVertex3f(x + width / 2.0, y + height / 2.0, z - length / 2.0); // Top Right Of The Texture and Quad
+            rlTexCoord2f(0.0, height / 100.0);
+            rlVertex3f(x + width / 2.0, y + height / 2.0, z + length / 2.0); // Top Left Of The Texture and Quad
+            rlTexCoord2f(0.0, 0.0);
+            rlVertex3f(x + width / 2.0, y - height / 2.0, z + length / 2.0); // Bottom Left Of The Texture and Quad
+                                                                             // Left Face
+            rlNormal3f(-1.0, 0.0, 0.0); // Normal Pointing Left
+            rlTexCoord2f(0.0, 0.0);
+            rlVertex3f(x - width / 2.0, y - height / 2.0, z - length / 2.0); // Bottom Left Of The Texture and Quad
+            rlTexCoord2f(length / 100.0, 0.0);
+            rlVertex3f(x - width / 2.0, y - height / 2.0, z + length / 2.0); // Bottom Right Of The Texture and Quad
+            rlTexCoord2f(length / 100.0, height / 100.0);
+            rlVertex3f(x - width / 2.0, y + height / 2.0, z + length / 2.0); // Top Right Of The Texture and Quad
+            rlTexCoord2f(0.0, height / 100.0);
+            rlVertex3f(x - width / 2.0, y + height / 2.0, z - length / 2.0); // Top Left Of The Texture and Quad
+            rlEnd();
+            rlDisableTexture();
         }
     }
 }

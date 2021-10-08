@@ -4,6 +4,7 @@ use super::{
 };
 use futures_util::StreamExt;
 use messagepack_rs::{deserializable::Deserializable, value::Value};
+use raylib::prelude::{RaylibHandle, RaylibThread};
 use std::io::BufReader;
 use std::io::Cursor;
 
@@ -19,7 +20,7 @@ impl Gamestate {
     /// seperated from update function to be more streamline
     /// assumes only one possible message, multiple calls will have to be made in order to assure it's
     /// fully parsed and no waiting packets
-    pub async fn parse_network(&mut self) {
+    pub async fn parse_network(&mut self, rl: &mut RaylibHandle, thread: &RaylibThread) {
         if let Ok(e) = tokio::time::timeout(
             ::std::time::Duration::from_millis(5),
             self.socket.read_stream.next(),
@@ -84,7 +85,8 @@ impl Gamestate {
                                 } else if mes[0] == Value::from("init") {
                                     // INIT A GAME/MAP
                                     if let Value::UInt8(v) = mes[1] {
-                                        self.map = Map::from_map_text(from_index(v)).unwrap();
+                                        self.map =
+                                            Map::from_map_text(from_index(v), rl, thread).unwrap();
                                     }
                                 }
                             }

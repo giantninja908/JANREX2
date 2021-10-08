@@ -98,7 +98,7 @@ pub struct Gamestate {
 }
 
 impl Gamestate {
-    pub async fn new(rl: &mut RaylibHandle) -> Self {
+    pub async fn new(rl: &mut RaylibHandle, thread: &RaylibThread) -> Self {
         let token = token_fetch::token_arg().await;
         println!("{:?}", token);
         let webinfo = token_fetch::get_websocket_info(&token).await.unwrap();
@@ -124,7 +124,7 @@ impl Gamestate {
         let stream_writer = PacketSender::new(write).await;
         let map_dat = maps::map::from_index(0);
         println!("{}", map_dat);
-        let map = maps::Map::from_map_text(map_dat).unwrap();
+        let map = maps::Map::from_map_text(map_dat, rl, thread).unwrap();
         println!("{:?}", map);
 
         Self {
