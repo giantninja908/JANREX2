@@ -22,7 +22,7 @@ impl Gamestate {
     /// fully parsed and no waiting packets
     pub async fn parse_network(&mut self, rl: &mut RaylibHandle, thread: &RaylibThread) {
         if let Ok(e) = tokio::time::timeout(
-            ::std::time::Duration::from_millis(5),
+            ::std::time::Duration::from_millis(1),
             self.socket.read_stream.next(),
         )
         .await

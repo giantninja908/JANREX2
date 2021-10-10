@@ -14,7 +14,7 @@ async fn main() {
         .resizable()
         .build();
 
-    rl.set_target_fps(120);
+    // rl.set_target_fps(120);
 
     {
         let mut d = rl.begin_drawing(&thread);
