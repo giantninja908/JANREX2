@@ -9,12 +9,12 @@ pub(crate) use raylib::prelude::*;
 async fn main() {
     let (mut rl, thread) = raylib::init()
         .msaa_4x()
-        .size(1920, 1080)
+        .size(2880, 1440)
         .title("JANREX 2")
         .resizable()
         .build();
 
-    // rl.set_target_fps(120);
+    rl.set_target_fps(90);
 
     {
         let mut d = rl.begin_drawing(&thread);

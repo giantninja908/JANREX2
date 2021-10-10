@@ -5,6 +5,7 @@ mod update;
 use crate::{gui, packet_sender::PacketSender, token_fetch};
 use futures_util::StreamExt;
 use raylib::prelude::*;
+use raylib::vr::*;
 use tokio_tungstenite::connect_async;
 
 enum Class {
@@ -95,6 +96,7 @@ pub struct Gamestate {
     menus: GameMenus,
     window_size: Vector2,
     map: maps::Map,
+    vr: RaylibVR,
 }
 
 impl Gamestate {
@@ -125,6 +127,23 @@ impl Gamestate {
         let map_dat = maps::map::from_index(0);
         let map = maps::Map::from_map_text(map_dat, rl, thread).unwrap();
 
+        let mut vr = RaylibVR::init_vr_simulator(thread);
+        let hmd = raylib::ffi::VrDeviceInfo {
+            // Acer Windows Mixed Reality parameters for simulator
+            hResolution: 2880,            // HMD horizontal resolution in pixels
+            vResolution: 1440,            // HMD vertical resolution in pixels
+            hScreenSize: 0.133793,        // HMD horizontal size in meters
+            vScreenSize: 0.0669,          // HMD vertical size in meters
+            vScreenCenter: 0.04678,       // HMD screen center in meters
+            eyeToScreenDistance: 0.041,   // HMD distance between eye and display in meters
+            lensSeparationDistance: 0.07, // HMD lens separation distance in meters
+            interpupillaryDistance: 0.07, // HMD IPD (distance between pupils) in meters
+
+            lensDistortionValues: [1.0, 0.22, 0.24, 0.0],
+            chromaAbCorrection: [0.996, -0.004, 1.014, 0.0],
+        };
+        vr.set_vr_configuration(thread, hmd, rl.load_shader_code(thread,None,None));
+
         Self {
             messages: Vec::new(),
             players: Vec::new(),
@@ -146,6 +165,7 @@ impl Gamestate {
             },
             window_size: Vector2::new(1280.0, 720.0),
             map,
+            vr,
         }
     }
 }

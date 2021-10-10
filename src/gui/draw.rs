@@ -3,7 +3,7 @@ use super::*;
 impl GuiElement {
     pub fn draw(
         &self,
-        d: &mut RaylibDrawHandle,
+        d: &mut RaylibVRMode<RaylibDrawHandle>,
         thread: &RaylibThread,
         offset: Vector2,
         scaler: Vector2,

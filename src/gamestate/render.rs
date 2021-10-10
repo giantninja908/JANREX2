@@ -7,6 +7,7 @@ impl Gamestate {
     pub fn render(&mut self, mut rl: &mut raylib::RaylibHandle, thread: &RaylibThread) {
         let time = rl.get_time() as f32;
         let mut d = rl.begin_drawing(thread);
+        let mut d = d.begin_vr_mode(&self.vr);
         d.clear_background(Color::BLACK);
         d.draw_text(&format!("Game Code: {}", self.code), 0, 0, 20, Color::WHITE);
 

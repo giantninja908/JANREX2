@@ -351,7 +351,7 @@ impl Map {
     /// using raylib handles, render a map
     pub fn render(
         &mut self,
-        mut rl: &mut raylib::drawing::RaylibMode3D<raylib::drawing::RaylibDrawHandle>,
+        mut rl: &mut raylib::drawing::RaylibMode3D<raylib::drawing::RaylibVRMode<raylib::drawing::RaylibDrawHandle>>,
         thread: &RaylibThread,
     ) {
         let mut d2 = rl.begin_shader_mode(&self.map_shader);
