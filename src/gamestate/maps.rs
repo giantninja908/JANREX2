@@ -12,6 +12,7 @@ pub mod map {
     pub const FREIGHT: &str = include_str!("../../maps/freight.json");
     pub const LOSTWORLD: &str = include_str!("../../maps/lostworld.json");
     pub const CITADEL: &str = include_str!("../../maps/citadel.json");
+
     pub fn from_index(indx: u8) -> &'static str {
         if indx == 0 {
             BURG
@@ -32,7 +33,7 @@ pub mod map {
         } else if indx == 8 {
             CITADEL
         } else {
-            panic!("Map not implemeneted yet");
+            LOSTWORLD
         }
     }
 }
@@ -151,6 +152,7 @@ pub struct Map {
     spawns: Vec<Spawn>,
     objects: Vec<Object>,
     textures: HashMap<ObjectTexture, Texture2D>,
+    map_shader: Shader,
 }
 
 impl Map {
@@ -165,16 +167,13 @@ impl Map {
             .as_array()
             .unwrap()
             .iter()
-            .map(|e| {
-                println!("{:?}", e);
-                Spawn {
-                    pos: Vector3::new(
-                        e[0].as_f64().unwrap() as f32,
-                        e[1].as_f64().unwrap() as f32,
-                        e[2].as_f64().unwrap() as f32,
-                    ),
-                    rotation: e[4].as_f64().unwrap() as f32 * 90.0,
-                }
+            .map(|e| Spawn {
+                pos: Vector3::new(
+                    e[0].as_f64().unwrap() as f32,
+                    e[1].as_f64().unwrap() as f32,
+                    e[2].as_f64().unwrap() as f32,
+                ),
+                rotation: e[4].as_f64().unwrap() as f32 * 90.0,
             })
             .collect::<Vec<_>>();
 
@@ -332,10 +331,20 @@ impl Map {
             ObjectTexture::Grey
         );
 
+        let mut map_shader = rl.load_shader_code(
+            thread,
+            Some(include_str!("../../assets/shaders/map.vs")),
+            // None,
+            Some(include_str!("../../assets/shaders/map.fs")),
+        );
+        map_shader.locs_mut()[raylib::consts::ShaderLocationIndex::LOC_MATRIX_MODEL as usize] =
+            map_shader.get_shader_location("matModel");
+
         Ok(Map {
             spawns,
             objects,
             textures,
+            map_shader,
         })
     }
 
@@ -345,11 +354,13 @@ impl Map {
         mut rl: &mut raylib::drawing::RaylibMode3D<raylib::drawing::RaylibDrawHandle>,
         thread: &RaylibThread,
     ) {
+        let mut d2 = rl.begin_shader_mode(&self.map_shader);
+
         for obj in self.objects.iter() {
             if obj.visible {
                 match &obj.texture.0 {
                     ObjectTexture::Default => {
-                        rl.draw_cube_v(
+                        d2.draw_cube_v(
                             obj.position,
                             obj.scale,
                             match &obj.emission {
@@ -358,17 +369,17 @@ impl Map {
                             },
                         );
                     }
+
                     _ => match &obj.emission {
-                        Some(e) => rl.draw_cube_v(obj.position, obj.scale, e),
+                        Some(e) => d2.draw_cube_v(obj.position, obj.scale, e),
                         None => Map::render_cube(
-                            self.textures.get(&ObjectTexture::Brick).unwrap(),
+                            self.textures.get(&obj.texture.0).unwrap(),
                             obj.position,
                             obj.scale,
                             obj.color,
                         ),
                     },
                 }
-                // rl.draw_cube_v(obj.position, obj.scale, obj.color);
             }
         }
     }

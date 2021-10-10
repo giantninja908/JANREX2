@@ -123,9 +123,7 @@ impl Gamestate {
 
         let stream_writer = PacketSender::new(write).await;
         let map_dat = maps::map::from_index(0);
-        println!("{}", map_dat);
         let map = maps::Map::from_map_text(map_dat, rl, thread).unwrap();
-        println!("{:?}", map);
 
         Self {
             messages: Vec::new(),
