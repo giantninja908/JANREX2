@@ -37,57 +37,84 @@ impl Gamestate {
                         match msg {
                             Value::Array(mes) => {
                                 println!("{:?}, {:?}", mes, mes[0]);
-                                if mes[0] == Value::from("pi") {
-                                    send!(self, Value::from(vec![Value::from("po")]));
-                                    println!("PONG")
-                                } else if mes[0] == Value::from("load") {
-                                    send!(self, Value::from(vec![Value::from("load"), Value::Nil]));
-                                    println!("LOAD")
-                                } else if mes[0] == Value::from("ch") {
-                                    println!(
-                                        "\n\nCHAT MESSAGE\n{}\n\n",
-                                        match &mes[3] {
-                                            Value::String(msg) => msg,
-                                            _ => "undefined",
+                                match &mes[0] {
+                                    Value::String(val) => {
+                                        match val.as_str() {
+                                            "pi" => {
+                                                send!(self, Value::from(vec![Value::from("po")]));
+                                                println!("PONG")
+                                            }
+                                            "load" => {
+                                                send!(
+                                                    self,
+                                                    Value::from(vec![
+                                                        Value::from("load"),
+                                                        Value::Nil
+                                                    ])
+                                                );
+                                                println!("LOAD")
+                                            }
+                                            "ch" => {
+                                                println!(
+                                                    "\n\nCHAT MESSAGE\n{}\n\n",
+                                                    match &mes[3] {
+                                                        Value::String(msg) => msg,
+                                                        _ => "undefined",
+                                                    }
+                                                );
+                                                self.messages.push(Message {
+                                                    content: match &mes[3] {
+                                                        Value::String(msg) => msg.to_string(),
+                                                        _ => String::from("undefined"),
+                                                    },
+                                                    sender: match &mes[2] {
+                                                        Value::String(auth) => {
+                                                            Some(auth.to_string())
+                                                        }
+                                                        _ => None,
+                                                    },
+                                                });
+                                            }
+                                            "ready" => {
+                                                send!(
+                                                    self,
+                                                    Value::from(vec![
+                                                        Value::from("sb"),
+                                                        Value::from("welc"),
+                                                        Value::Nil,
+                                                    ])
+                                                );
+                                            }
+                                            "t" => {
+                                                if let Value::String(s) = &mes[1] {
+                                                    self.time = Time::from(s.to_string());
+                                                }
+                                            }
+                                            "inst-id" => {
+                                                if let Value::String(s) = &mes[1] {
+                                                    self.code = s.to_string();
+                                                }
+                                            }
+                                            "sb" => {
+                                                if let Value::String(s) = &mes[1] {
+                                                    self.welc_msg = s.to_string();
+                                                }
+                                            }
+                                            "init" => {
+                                                // INIT A GAME/MAP
+                                                if let Value::UInt8(v) = mes[1] {
+                                                    self.map = Map::from_map_text(
+                                                        from_index(v),
+                                                        rl,
+                                                        thread,
+                                                    )
+                                                    .unwrap();
+                                                }
+                                            }
+                                            _ => {}
                                         }
-                                    );
-                                    self.messages.push(Message {
-                                        content: match &mes[3] {
-                                            Value::String(msg) => msg.to_string(),
-                                            _ => String::from("undefined"),
-                                        },
-                                        sender: match &mes[2] {
-                                            Value::String(auth) => Some(auth.to_string()),
-                                            _ => None,
-                                        },
-                                    });
-                                } else if mes[0] == Value::from("ready") {
-                                    send!(
-                                        self,
-                                        Value::from(vec![
-                                            Value::from("sb"),
-                                            Value::from("welc"),
-                                            Value::Nil,
-                                        ])
-                                    );
-                                } else if mes[0] == Value::from("t") {
-                                    if let Value::String(s) = &mes[1] {
-                                        self.time = Time::from(s.to_string());
                                     }
-                                } else if mes[0] == Value::from("inst-id") {
-                                    if let Value::String(s) = &mes[1] {
-                                        self.code = s.to_string();
-                                    }
-                                } else if mes[0] == Value::from("sb") {
-                                    if let Value::String(s) = &mes[1] {
-                                        self.welc_msg = s.to_string();
-                                    }
-                                } else if mes[0] == Value::from("init") {
-                                    // INIT A GAME/MAP
-                                    if let Value::UInt8(v) = mes[1] {
-                                        self.map =
-                                            Map::from_map_text(from_index(v), rl, thread).unwrap();
-                                    }
+                                    _ => {}
                                 }
                             }
                             _ => {
