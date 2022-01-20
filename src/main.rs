@@ -15,6 +15,16 @@ async fn main() {
         .build();
 
     // rl.set_target_fps(120);
+    {
+        let img_dat = include_bytes!("../assets/icon/icon.png");
+        let img = raylib::core::texture::Image::load_image_from_mem(
+            "png",
+            &(img_dat.iter().map(|x| *x).collect()),
+            img_dat.len() as i32,
+        )
+        .unwrap();
+        rl.set_window_icon(img);
+    }
 
     {
         let mut d = rl.begin_drawing(&thread);
