@@ -94,7 +94,7 @@ pub struct Gamestate {
     welc_msg: String,
     menus: GameMenus,
     window_size: Vector2,
-    map: maps::Map,
+    pub map: maps::Map, // put this public just for testing taking a random spawn location
 }
 
 impl Gamestate {
