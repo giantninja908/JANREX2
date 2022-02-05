@@ -3,15 +3,46 @@ use serde_json;
 use std::collections::HashMap;
 
 pub mod map {
-    pub const BURG: &str = include_str!("../../maps/burg.json");
-    pub const LITTLETOWN: &str = include_str!("../../maps/littletown.json");
-    pub const SANDSTORM: &str = include_str!("../../maps/sandstorm.json");
-    pub const SUBZERO: &str = include_str!("../../maps/subzero.json");
-    pub const UNDERGROWTH: &str = include_str!("../../maps/undergrowth.json");
-    pub const SHIPYARN: &str = include_str!("../../maps/shipyard.json");
-    pub const FREIGHT: &str = include_str!("../../maps/freight.json");
-    pub const LOSTWORLD: &str = include_str!("../../maps/lostworld.json");
-    pub const CITADEL: &str = include_str!("../../maps/citadel.json");
+
+    // _ Mew better version of the code below but it doesnt wanna work and takes more work
+
+    // pub const paths: std::fs::ReadDir = std::fs::read_dir("../../maps/jsons/").unwrap();
+    // pub fn from_index2(indx: u8) -> String {
+    //     let check_idx = 0;
+    //     for path in paths {
+    //         if check_idx == indx {
+    //             path.unwrap().path().display().to_string()
+    //         } else {
+    //             if check_idx > indx {
+    //                 break
+    //             }
+    //             check_idx+=1;
+    //         }
+    //     }
+    //     panic!("Map not implemeneted yet: {}", indx)
+    // }
+
+    pub const BURG: &str = include_str!("../../maps/jsons/Burg.json");
+    pub const LITTLETOWN: &str = include_str!("../../maps/jsons/Littletown.json");
+    pub const SANDSTORM: &str = include_str!("../../maps/jsons/Sandstorm.json");
+    pub const SUBZERO: &str = include_str!("../../maps/jsons/Subzero.json");
+    pub const UNDERGROWTH: &str = include_str!("../../maps/jsons/Undergrowth.json");
+    pub const SHIPYARN: &str = include_str!("../../maps/jsons/Shipyard.json");
+    pub const FREIGHT: &str = include_str!("../../maps/jsons/Freight.json");
+    pub const LOSTWORLD: &str = include_str!("../../maps/jsons/Lostworld.json");
+    pub const CITADEL: &str = include_str!("../../maps/jsons/Citadel.json");
+    pub const OASIS: &str = include_str!("../../maps/jsons/Oasis.json");
+    pub const KANJI: &str = include_str!("../../maps/jsons/Kanji.json");
+    pub const INDUSTRY: &str = include_str!("../../maps/jsons/Industry.json");
+    pub const LUMBER: &str = include_str!("../../maps/jsons/Lumber.json");
+    pub const EVACUATION: &str = include_str!("../../maps/jsons/Evacuation.json");
+    pub const SITE: &str = include_str!("../../maps/jsons/Site.json");
+    pub const SKYTEMPLE: &str = include_str!("../../maps/jsons/SkyTemple.json");
+    pub const LAGOON: &str = include_str!("../../maps/jsons/Lagoon.json");
+    pub const BUREAU: &str = include_str!("../../maps/jsons/Bureau.json");
+    pub const TORTUGA: &str = include_str!("../../maps/jsons/Tortuga.json");
+
+    // map idx is just how they get sent from the source code
     pub fn from_index(indx: u8) -> &'static str {
         if indx == 0 {
             BURG
@@ -31,15 +62,35 @@ pub mod map {
             LOSTWORLD
         } else if indx == 8 {
             CITADEL
+        } else if indx == 9 {
+            OASIS
+        } else if indx == 10 {
+            KANJI
+        } else if indx == 11 {
+            INDUSTRY
+        } else if indx == 12 {
+            LUMBER
+        } else if indx == 13 {
+            EVACUATION
+        } else if indx == 14 {
+            SITE
+        } else if indx == 15 {
+            SKYTEMPLE
+        } else if indx == 16 {
+            LAGOON
+        } else if indx == 17 {
+            BUREAU
+        } else if indx == 18 {
+            TORTUGA
         } else {
-            panic!("Map not implemeneted yet");
+            panic!("Map not implemeneted yet: {}", indx);
         }
     }
 }
 
 #[derive(Debug)]
-struct Spawn {
-    pos: Vector3,
+pub struct Spawn {
+    pub pos: Vector3,
     rotation: f32,
 }
 
@@ -148,7 +199,7 @@ struct Object {
 
 #[derive(Debug)]
 pub struct Map {
-    spawns: Vec<Spawn>,
+    pub spawns: Vec<Spawn>,
     objects: Vec<Object>,
     textures: HashMap<ObjectTexture, Texture2D>,
 }
