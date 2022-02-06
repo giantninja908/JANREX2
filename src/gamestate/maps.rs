@@ -3,25 +3,6 @@ use serde_json;
 use std::collections::HashMap;
 
 pub mod map {
-
-    // _ Mew better version of the code below but it doesnt wanna work and takes more work
-
-    // pub const paths: std::fs::ReadDir = std::fs::read_dir("../../maps/jsons/").unwrap();
-    // pub fn from_index2(indx: u8) -> String {
-    //     let check_idx = 0;
-    //     for path in paths {
-    //         if check_idx == indx {
-    //             path.unwrap().path().display().to_string()
-    //         } else {
-    //             if check_idx > indx {
-    //                 break
-    //             }
-    //             check_idx+=1;
-    //         }
-    //     }
-    //     panic!("Map not implemeneted yet: {}", indx)
-    // }
-
     pub const BURG: &str = include_str!("../../maps/jsons/Burg.json");
     pub const LITTLETOWN: &str = include_str!("../../maps/jsons/Littletown.json");
     pub const SANDSTORM: &str = include_str!("../../maps/jsons/Sandstorm.json");
