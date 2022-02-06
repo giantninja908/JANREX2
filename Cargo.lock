@@ -404,7 +404,6 @@ dependencies = [
  "futures-util",
  "http",
  "messagepack-rs",
- "rand",
  "raylib",
  "regex",
  "reqwest",

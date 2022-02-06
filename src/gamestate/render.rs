@@ -1,13 +1,13 @@
 use super::Gamestate;
 use raylib::prelude::*;
-// for random spawn position
-// use rand::seq::SliceRandom;
 
 impl Gamestate {
     /// render function
     /// renders the GameState, takes raylib requirements
-    pub fn render(&mut self, mut rl: &mut raylib::RaylibHandle, thread: &RaylibThread) {
+    pub fn render(&mut self, rl: &mut raylib::RaylibHandle, thread: &RaylibThread) {
         let time = rl.get_time() as f32;
+        let fps = &rl.get_fps();
+
         let mut d = rl.begin_drawing(thread);
         d.clear_background(Color::BLACK);
 
@@ -52,7 +52,6 @@ impl Gamestate {
                     100.0,
                     (time * 0.1).cos() * 100.0,
                 ),
-                // self.map.spawns.choose(&mut rand::thread_rng()).unwrap().pos,
                 Vector3::zero(),
                 Vector3::new(0.0, 1.0, 0.0),
                 90.0,
@@ -62,8 +61,7 @@ impl Gamestate {
 
         // rendering top left game code and fps display
         d.draw_text(&format!("Game Code: {}", self.code), 0, 0, 20, Color::WHITE);
-        d.draw_text(&format!("FPS: {}", unsafe { ffi::GetFPS() as u32 }), 0, 20, 20, Color::WHITE);
-
+        d.draw_text(&format!("FPS: {}", fps), 0, 20, 20, Color::WHITE);
         active_menu.draw(&mut d, thread, Vector2::zero(), self.window_size);
     }
 }
