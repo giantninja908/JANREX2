@@ -1,11 +1,11 @@
 use reqwest;
 use serde::{Deserialize, Serialize};
 use urlencoding::encode;
-
+use super::consts;
 /// fetches client key used for token generation
 /// fails in the event it cannot get data
 async fn client_key() -> Result<String, Box<dyn std::error::Error + Send + Sync>> {
-    let body = reqwest::get("https://api.sys32.dev/v2/key")
+    let body = reqwest::get(format!("{}{}", consts::UNOFFICIAL_API_BASE_URL, consts::CLIENT_KEY_ENDPOINT))
         .await?
         .text()
         .await?;
@@ -30,7 +30,7 @@ async fn matchmaker_token(
     let client = reqwest::Client::new();
 
     let body = client
-        .get("https://matchmaker.krunker.io/generate-token")
+        .get(consts::GENERATE_TOKEN_URL)
         .header("client-key", client_key)
         .send()
         .await?
@@ -51,7 +51,7 @@ async fn hask_token(
     let client = reqwest::Client::new();
 
     let body = client
-        .post("https://api.sys32.dev/v2/token")
+        .post(format!("{}{}", consts::UNOFFICIAL_API_BASE_URL, consts::HASH_TOKEN_ENDPOINT))
         .header("Content-Type", "application/json")
         .json(&token)
         .send()
@@ -100,7 +100,7 @@ pub async fn get_websocket_info(
     let client = reqwest::Client::new();
 
     let body = client
-        .get(format!("https://matchmaker.krunker.io/seek-game?hostname=krunker.io&region=us-nj&autoChangeGame=false&validationToken={}", encode(token)))
+        .get(format!("{}?hostname=krunker.io&region=us-nj&autoChangeGame=false&validationToken={}", consts::SEEK_GAME_URL, encode(token)))
         .header("Origin", "https://krunker.io")
         // .header("region", "us-nj")
         // .header("autoChangeGame", "false")

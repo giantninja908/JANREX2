@@ -1,6 +1,6 @@
 ### purpose
 
-this client aims to be an ACTUAL client, that can fundementally interface with krunker like the normal browser equivilent
+this client aims to be an ACTUAL client, that can fundementally interface with krunker like the normal browser equivalent
 
 # compiling
 
@@ -16,3 +16,5 @@ I'll accept most pull reqs, please don't just make issues without potential solu
 discord server can be found by clicking the image below:
 
 [![Discord server](https://discordapp.com/api/guilds/858349630881923083/widget.png?style=banner1)](https://discord.gg/UdZvmNeNqq)
+
+in case this broke and doesnt run anymore, there are a few screenshots in [assets/ingame_pictures] to see how it looks

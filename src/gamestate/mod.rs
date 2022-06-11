@@ -85,15 +85,42 @@ struct GameMenus {
     active: ActiveMenu,
 }
 
+struct Cameras {
+    main_menu: Camera, // lobby camera
+    in_game: Camera,
+}
+
+struct CameraState {
+    camera: Camera,
+}
+
+pub fn new_camera_main_menu(time: &f32) -> Camera {
+    Camera::perspective(
+        Vector3::new(
+            (time * 0.1).sin() * 100.0,
+            100.0,
+            (time * 0.1).cos() * 100.0,
+        ),
+        Vector3::zero(),
+        Vector3::new(0.0, 1.0, 0.0),
+        90.0,
+    )
+}
+
 pub struct Gamestate {
     messages: Vec<Message>,
     players: Vec<Player>,
     time: Time,
     socket: SocketData,
     code: String,
+    code_last: Option<String>, // last code state to only update once it changed to save on potential heavy event
     welc_msg: String,
     menus: GameMenus,
     window_size: Vector2,
+
+    camera_state: CameraState,
+    last_spawn: Option<maps::Spawn>,
+    last_mpos: Vector2,
     pub map: maps::Map, // put this public just for testing taking a random spawn location
 }
 
@@ -127,6 +154,8 @@ impl Gamestate {
         let map = maps::Map::from_map_text(map_dat, rl, thread).unwrap();
         println!("{:?}", map);
 
+        let time = rl.get_time() as f32;
+
         Self {
             messages: Vec::new(),
             players: Vec::new(),
@@ -140,6 +169,7 @@ impl Gamestate {
                 stream_writer,
             },
             code: webinfo.gameId,
+            code_last: None,
             welc_msg: String::new(),
             menus: GameMenus {
                 main_menu: gui::GuiElement::main_menu(),
@@ -147,6 +177,11 @@ impl Gamestate {
                 active: ActiveMenu::MainMenu,
             },
             window_size: Vector2::new(1280.0, 720.0),
+            camera_state: CameraState {
+                camera: new_camera_main_menu(&time),
+            },
+            last_spawn: None,
+            last_mpos: Vector2::zero(),
             map,
         }
     }

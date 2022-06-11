@@ -1,5 +1,6 @@
-#[allow(dead_code)] // to reduce warning spam
+// #[allow(dead_code)] // to reduce warning spam
 
+mod consts;
 mod gamestate;
 mod gui;
 mod key_rotate;
@@ -19,8 +20,9 @@ async fn main() {
         .resizable()
         .build();
 
-    // rl.set_target_fps(120);
-    // rl.set_target_fps(5000); // fps seems to be way worse than expected for such a simplistic completely rust client (the chief cpp client returned higher fps by quite a lot)
+    rl.set_exit_key(None); // so switching between ingame window and main menu is possible
+    rl.set_target_fps(120); // comment out for unlimited fps
+
     {
         let img_dat = include_bytes!("../assets/icon/icon.png");
         let img = raylib::core::texture::Image::load_image_from_mem(

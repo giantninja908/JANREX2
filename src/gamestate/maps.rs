@@ -3,95 +3,60 @@ use serde_json;
 use std::collections::HashMap;
 
 pub mod map {
-
-    // _ Mew better version of the code below but it doesnt wanna work and takes more work
-
-    // pub const paths: std::fs::ReadDir = std::fs::read_dir("../../maps/jsons/").unwrap();
-    // pub fn from_index2(indx: u8) -> String {
-    //     let check_idx = 0;
-    //     for path in paths {
-    //         if check_idx == indx {
-    //             path.unwrap().path().display().to_string()
-    //         } else {
-    //             if check_idx > indx {
-    //                 break
-    //             }
-    //             check_idx+=1;
-    //         }
-    //     }
-    //     panic!("Map not implemeneted yet: {}", indx)
-    // }
-
-    pub const BURG: &str = include_str!("../../maps/jsons/Burg.json");
-    pub const LITTLETOWN: &str = include_str!("../../maps/jsons/Littletown.json");
-    pub const SANDSTORM: &str = include_str!("../../maps/jsons/Sandstorm.json");
-    pub const SUBZERO: &str = include_str!("../../maps/jsons/Subzero.json");
-    pub const UNDERGROWTH: &str = include_str!("../../maps/jsons/Undergrowth.json");
-    pub const SHIPYARN: &str = include_str!("../../maps/jsons/Shipyard.json");
-    pub const FREIGHT: &str = include_str!("../../maps/jsons/Freight.json");
-    pub const LOSTWORLD: &str = include_str!("../../maps/jsons/Lostworld.json");
-    pub const CITADEL: &str = include_str!("../../maps/jsons/Citadel.json");
-    pub const OASIS: &str = include_str!("../../maps/jsons/Oasis.json");
-    pub const KANJI: &str = include_str!("../../maps/jsons/Kanji.json");
-    pub const INDUSTRY: &str = include_str!("../../maps/jsons/Industry.json");
-    pub const LUMBER: &str = include_str!("../../maps/jsons/Lumber.json");
-    pub const EVACUATION: &str = include_str!("../../maps/jsons/Evacuation.json");
-    pub const SITE: &str = include_str!("../../maps/jsons/Site.json");
-    pub const SKYTEMPLE: &str = include_str!("../../maps/jsons/SkyTemple.json");
-    pub const LAGOON: &str = include_str!("../../maps/jsons/Lagoon.json");
-    pub const BUREAU: &str = include_str!("../../maps/jsons/Bureau.json");
-    pub const TORTUGA: &str = include_str!("../../maps/jsons/Tortuga.json");
+    // retarded to load a maps into memory but its faster than loading on request
+    pub const BURG:        &str = include_str!("../../maps/jsons/00_Burg.json");
+    pub const LITTLETOWN:  &str = include_str!("../../maps/jsons/01_Littletown.json");
+    pub const SANDSTORM:   &str = include_str!("../../maps/jsons/02_Sandstorm.json");
+    pub const SUBZERO:     &str = include_str!("../../maps/jsons/03_Subzero.json");
+    pub const UNDERGROWTH: &str = include_str!("../../maps/jsons/04_Undergrowth.json");
+    pub const SHIPMENT:    &str = include_str!("../../maps/jsons/05_Shipment.json"); // old name "05_Shipyard.json"
+    pub const FREIGHT:     &str = include_str!("../../maps/jsons/06_Freight.json");
+    pub const LOSTWORLD:   &str = include_str!("../../maps/jsons/07_Lostworld.json");
+    pub const CITADEL:     &str = include_str!("../../maps/jsons/08_Citadel.json");
+    pub const OASIS:       &str = include_str!("../../maps/jsons/09_Oasis.json");
+    pub const KANJI:       &str = include_str!("../../maps/jsons/10_Kanji.json");
+    pub const INDUSTRY:    &str = include_str!("../../maps/jsons/11_Industry.json");
+    pub const LUMBER:      &str = include_str!("../../maps/jsons/12_Lumber.json");
+    pub const EVACUATION:  &str = include_str!("../../maps/jsons/13_Evacuation.json");
+    pub const SITE:        &str = include_str!("../../maps/jsons/14_Site.json");
+    pub const SKYTEMPLE:   &str = include_str!("../../maps/jsons/15_SkyTemple.json");
+    pub const LAGOON:      &str = include_str!("../../maps/jsons/16_Lagoon.json");
+    pub const BUREAU:      &str = include_str!("../../maps/jsons/17_Bureau.json");
+    pub const TORTUGA:     &str = include_str!("../../maps/jsons/18_Tortuga.json");
+    pub const TROPICANO:   &str = include_str!("../../maps/jsons/19_Tropicano.json");
 
     // map idx is just how they get sent from the source code
     pub fn from_index(indx: u8) -> &'static str {
-        if indx == 0 {
-            BURG
-        } else if indx == 1 {
-            LITTLETOWN
-        } else if indx == 2 {
-            SANDSTORM
-        } else if indx == 3 {
-            SUBZERO
-        } else if indx == 4 {
-            UNDERGROWTH
-        } else if indx == 5 {
-            SHIPYARN
-        } else if indx == 6 {
-            FREIGHT
-        } else if indx == 7 {
-            LOSTWORLD
-        } else if indx == 8 {
-            CITADEL
-        } else if indx == 9 {
-            OASIS
-        } else if indx == 10 {
-            KANJI
-        } else if indx == 11 {
-            INDUSTRY
-        } else if indx == 12 {
-            LUMBER
-        } else if indx == 13 {
-            EVACUATION
-        } else if indx == 14 {
-            SITE
-        } else if indx == 15 {
-            SKYTEMPLE
-        } else if indx == 16 {
-            LAGOON
-        } else if indx == 17 {
-            BUREAU
-        } else if indx == 18 {
-            TORTUGA
-        } else {
-            panic!("Map not implemeneted yet: {}", indx);
+        match indx {
+            0 => BURG,
+            1 => LITTLETOWN,
+            2 => SANDSTORM,
+            3 => SUBZERO,
+            4 => UNDERGROWTH,
+            5 => SHIPMENT,
+            6 => FREIGHT,
+            7 => LOSTWORLD,
+            8 => CITADEL,
+            9 => OASIS,
+            10 => KANJI,
+            11 => INDUSTRY,
+            12 => LUMBER,
+            13 => EVACUATION,
+            14 => SITE,
+            15 => SKYTEMPLE,
+            16 => LAGOON,
+            17 => BUREAU,
+            18 => TORTUGA,
+            19 => TROPICANO,
+            _ => panic!("Map not implemeneted yet: {}", indx)
         }
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone, Copy)]
 pub struct Spawn {
     pub pos: Vector3,
-    rotation: f32,
+    pub rotation: f32,
 }
 
 #[derive(Debug)]
@@ -184,12 +149,14 @@ enum ObjectType {
 }
 
 #[derive(Debug)]
-struct Object {
-    position: Vector3,
-    scale: Vector3,
+pub struct Object {
+    pub position: Vector3,
+    pub scale: Vector3,
+    pos_max: Vector3,
+    pos_min: Vector3,
     texture: (ObjectTexture, ObjectTextureVariant),
     visible: bool,
-    collision: bool,
+    pub collision: bool,
     wall_jumpable: bool,
     grapplable: bool,
     r#type: ObjectType,
@@ -200,7 +167,7 @@ struct Object {
 #[derive(Debug)]
 pub struct Map {
     pub spawns: Vec<Spawn>,
-    objects: Vec<Object>,
+    pub objects: Vec<Object>,
     textures: HashMap<ObjectTexture, Texture2D>,
 }
 
@@ -284,7 +251,17 @@ impl Map {
                             pos[2].as_f64().unwrap() as f32,
                         ),
                         scale: Vector3::new(scale[0], scale[1], scale[2]),
-                        collision: is_true(&obj["l"]),
+                        pos_max: Vector3::new(
+                            pos[0].as_f64().unwrap() as f32 + scale[0],
+                            pos[1].as_f64().unwrap() as f32 + scale[1],
+                            pos[2].as_f64().unwrap() as f32 + scale[2],
+                        ),
+                        pos_min: Vector3::new(
+                            pos[0].as_f64().unwrap() as f32 - scale[0],
+                            pos[1].as_f64().unwrap() as f32 - scale[1],
+                            pos[2].as_f64().unwrap() as f32 - scale[2],
+                        ),
+                        collision: !is_true(&obj["l"]),
                         color: if obj["ci"].is_u64() {
                             Color::from_hex(cols[obj["ci"].as_u64().unwrap() as usize]).unwrap()
                         } else {
@@ -308,6 +285,8 @@ impl Map {
                     Object {
                         position: Vector3::zero(),
                         scale: Vector3::one(),
+                        pos_max: Vector3::zero(),
+                        pos_min: Vector3::zero(),
                         collision: false,
                         color: Color::BLANK,
                         grapplable: false,
@@ -496,4 +475,26 @@ impl Map {
             rlDisableTexture();
         }
     }
+}
+
+
+// Collisions quick test code (needs to be completely rewritten)
+pub struct PlayerBox {
+    pub position: Vector3,
+    pub scale: Vector3,
+    pub pos_max: Vector3,
+    pub pos_min: Vector3,
+}
+
+#[allow(non_snake_case)]
+pub fn is_point_inside_AABB(point: Vector3, obj: &Object) -> bool {
+    (point.x >= obj.pos_min.x && point.x <= obj.pos_max.x) &&
+    (point.y >= obj.pos_min.y && point.y <= obj.pos_max.y) &&
+    (point.z >= obj.pos_min.z && point.z <= obj.pos_max.z)
+}
+
+pub fn intersect(p: &PlayerBox, obj: &Object) -> bool {
+    (p.pos_min.x <= obj.pos_max.x && p.pos_max.x >= obj.pos_min.x) &&
+    (p.pos_min.y <= obj.pos_max.y && p.pos_max.y >= obj.pos_min.y) &&
+    (p.pos_min.z <= obj.pos_max.z && p.pos_max.z >= obj.pos_min.z)
 }

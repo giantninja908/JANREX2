@@ -1,4 +1,19 @@
- TODO
+# TODO
+
+- next steps (that i would do)
+- 3d camera fix
+- collisions
+- movement (jumping/slidehopping)
+- implementing server communication (like joining game not only on client-side)
+...
+
+- known bugs
+    - camera disappears sometimes (gets completely black)
+    - camera flickers when looking straight up/down
+    - time display doesnt update when being ingame (since it should have a different ui than the lobby, i didnt bother to fix it)
+
+- network unknown packets implementation
+
 - function implementation
     - n
     - 0
